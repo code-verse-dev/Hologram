@@ -635,5 +635,4 @@ document.querySelectorAll("img").forEach((img) => {
   }
 });
 
-window.__scenes = scenes;
 animate();

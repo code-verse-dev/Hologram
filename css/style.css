@@ -555,7 +555,7 @@ body {
   display: block;
   width: 100%;
   aspect-ratio: 16 / 11;
-  background-size: 200% 200%;
+  background-size: 203% 203%; /* slight overscan hides the sheet's gutter lines */
   background-repeat: no-repeat;
 }
 
@@ -565,6 +565,13 @@ body {
 .holo-tile[data-room="2"] .holo-tile__img,
 .holo-tile[data-room="3"] .holo-tile__img {
   background-image: url("https://d8j0ntlcm91z4.cloudfront.net/user_3GUIfWCz9drcsNGiaLpyB1O8LMi/hf_20260714_204058_984db2ff-f5c2-414f-af3d-f52056839004.png");
+}
+
+.holo-tile[data-room="4"] .holo-tile__img,
+.holo-tile[data-room="5"] .holo-tile__img,
+.holo-tile[data-room="6"] .holo-tile__img,
+.holo-tile[data-room="7"] .holo-tile__img {
+  background-image: url("https://d8j0ntlcm91z4.cloudfront.net/user_3GUIfWCz9drcsNGiaLpyB1O8LMi/hf_20260714_204637_bbb6ad1c-952f-4323-a181-11609b24e938.png");
 }
 .holo-tile[data-room="0"] .holo-tile__img,
 .holo-tile[data-room="4"] .holo-tile__img { background-position: 0% 0%; }

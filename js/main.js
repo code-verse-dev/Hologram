@@ -226,8 +226,8 @@ createScene(document.getElementById("hero-canvas"), {
     });
 
     entry.head = new THREE.Points(headGeo, headMat);
-    entry.head.scale.setScalar(1.5);
-    entry.head.position.set(2.8, -2.1, 0);
+    entry.head.scale.setScalar(1.45);
+    entry.head.position.set(3.7, -1.85, 0);
     scene.add(entry.head);
 
     // faint wireframe ghost inside the head for structure
@@ -236,13 +236,13 @@ createScene(document.getElementById("hero-canvas"), {
       new THREE.MeshBasicMaterial({ color: BLUE, wireframe: true, transparent: true, opacity: 0.05 }),
     );
     ghost.scale.set(1, 1.22, 1.05);
-    ghost.position.set(2.8, 0.35, 0);
+    ghost.position.set(3.7, 0.5, 0);
     scene.add(ghost);
     entry.ghost = ghost;
 
     entry.rings = new THREE.Group();
     for (let i = 0; i < 5; i++) {
-      const r = 1.6 + i * 0.75;
+      const r = 1.35 + i * 0.62;
       const geo = new THREE.TorusGeometry(r, 0.012 + 0.004 * (4 - i), 8, 128);
       const mat = new THREE.MeshBasicMaterial({
         color: i % 2 ? BLUE : CYAN,
@@ -252,7 +252,7 @@ createScene(document.getElementById("hero-canvas"), {
       });
       const ring = new THREE.Mesh(geo, mat);
       ring.rotation.x = Math.PI / 2.15;
-      ring.position.set(2.8, -2.2, 0);
+      ring.position.set(3.7, -1.95, 0);
       entry.rings.add(ring);
     }
     scene.add(entry.rings);
@@ -264,8 +264,8 @@ createScene(document.getElementById("hero-canvas"), {
     for (let i = 0; i < N; i++) {
       const a = Math.random() * Math.PI * 2;
       const r = 1 + Math.random() * 3.4;
-      pos[i * 3] = 2.8 + Math.cos(a) * r;
-      pos[i * 3 + 1] = -2.5 + Math.random() * 6;
+      pos[i * 3] = 3.7 + Math.cos(a) * r;
+      pos[i * 3 + 1] = -2.2 + Math.random() * 5.4;
       pos[i * 3 + 2] = Math.sin(a) * r;
       entry.speeds[i] = 0.15 + Math.random() * 0.5;
     }
@@ -283,7 +283,7 @@ createScene(document.getElementById("hero-canvas"), {
     const pos = entry.parts.geometry.attributes.position;
     for (let i = 0; i < pos.count; i++) {
       let y = pos.getY(i) + entry.speeds[i] * 0.016;
-      if (y > 3.8) y = -2.5;
+      if (y > 3.2) y = -2.2;
       pos.setY(i, y);
     }
     pos.needsUpdate = true;
@@ -433,7 +433,7 @@ createScene(document.getElementById("fob-canvas"), {
 createScene(document.getElementById("globe-canvas"), {
   camera: new THREE.PerspectiveCamera(45, 1, 0.1, 100),
   build(scene, entry) {
-    entry.camera.position.z = 5.4;
+    entry.camera.position.z = 6.8;
     entry.globe = new THREE.Group();
 
     const N = 1100, R = 1.75;
@@ -525,7 +525,7 @@ createScene(document.getElementById("timeline-canvas"), {
 createScene(document.getElementById("arch-canvas"), {
   camera: new THREE.PerspectiveCamera(45, 1, 0.1, 100),
   build(scene, entry) {
-    entry.camera.position.set(0, 2.2, 7.0);
+    entry.camera.position.set(0, 2.0, 8.6);
     entry.camera.lookAt(0, 0, 0);
     entry.tower = new THREE.Group();
 

@@ -463,6 +463,10 @@ body {
 .fob__img {
   position: relative;
   width: 78%;
+  /* screen-blend hides the source image's black background on the dark panel */
+  mix-blend-mode: screen;
+  -webkit-mask-image: radial-gradient(ellipse 72% 78% at 50% 48%, #000 55%, transparent 78%);
+  mask-image: radial-gradient(ellipse 72% 78% at 50% 48%, #000 55%, transparent 78%);
   filter: drop-shadow(0 0 44px rgba(0, 160, 255, 0.4));
   animation: float 6s ease-in-out infinite;
 }
@@ -992,10 +996,14 @@ body {
 
 .future__hand {
   position: absolute;
-  right: -8%;
-  bottom: -6%;
-  width: 68%;
-  opacity: 0.9;
+  right: -4%;
+  bottom: -3%;
+  width: 66%;
+  opacity: 0.95;
+  /* screen-blend removes the image's black background against the panel */
+  mix-blend-mode: screen;
+  -webkit-mask-image: radial-gradient(ellipse 78% 82% at 55% 55%, #000 52%, transparent 80%);
+  mask-image: radial-gradient(ellipse 78% 82% at 55% 55%, #000 52%, transparent 80%);
   filter: drop-shadow(0 0 40px rgba(0, 140, 255, 0.3));
   pointer-events: none;
   animation: float 8s ease-in-out infinite;

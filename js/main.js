@@ -2,6 +2,7 @@
 // Three.js animated landing page
 
 import * as THREE from "three";
+import { GLTFLoader } from "./vendor/loaders/GLTFLoader.js";
 
 const CYAN = new THREE.Color("#00d4ff");
 const BLUE = new THREE.Color("#0f8dff");
@@ -328,9 +329,56 @@ createScene(document.getElementById("dna-canvas"), {
     entry.helix.add(makePoints(rungs, { size: 0.05, color: new THREE.Color("#6fb6ff"), opacity: 0.5 }));
     entry.helix.rotation.z = -0.08;
     scene.add(entry.helix);
+
+    // 3D DNA hologram model layered over the particle helix
+    scene.add(new THREE.AmbientLight(0x224466, 2.2));
+    const key = new THREE.DirectionalLight(0x66ccff, 2.6);
+    key.position.set(2, 3, 5);
+    scene.add(key);
+    const fill = new THREE.DirectionalLight(0x8b5cf6, 1.4);
+    fill.position.set(-3, -2, 4);
+    scene.add(fill);
+
+    new GLTFLoader().load("assets/dna_hologram.glb", (gltf) => {
+      const model = gltf.scene;
+      const box = new THREE.Box3().setFromObject(model);
+      const size = box.getSize(new THREE.Vector3());
+      const center = box.getCenter(new THREE.Vector3());
+      const scale = 10 / Math.max(size.x, size.y, size.z);
+      model.position.sub(center.multiplyScalar(1));
+      const wrap = new THREE.Group();
+      wrap.add(model);
+      model.position.copy(center.negate());
+      wrap.scale.setScalar(scale);
+      // the strand's long axis is X — keep it horizontal with a slight tilt
+      wrap.rotation.z = -0.1;
+      // holographic material treatment — force glow colors, the GLB's
+      // base colors are too dark to read against the panel
+      let mi = 0;
+      model.traverse((o) => {
+        if (o.isMesh) {
+          const glow = mi++ % 2 ? 0x8b5cf6 : 0x00d4ff;
+          o.material = new THREE.MeshStandardMaterial({
+            color: glow,
+            emissive: glow,
+            emissiveIntensity: 2.0,
+            transparent: true,
+            opacity: 0.85,
+            roughness: 0.4,
+            metalness: 0.1,
+          });
+        }
+      });
+      entry.dnaModel = wrap;
+      scene.add(wrap);
+
+      // soften the procedural helix so the model reads as the hero of the panel
+      
+    }, undefined, () => { /* keep the particle helix if the model fails to load */ });
   },
   update(t, entry) {
     entry.helix.rotation.x = t * 0.35;
+    if (entry.dnaModel) entry.dnaModel.rotation.x = t * 0.55;
   },
 });
 
@@ -587,4 +635,5 @@ document.querySelectorAll("img").forEach((img) => {
   }
 });
 
+window.__scenes = scenes;
 animate();

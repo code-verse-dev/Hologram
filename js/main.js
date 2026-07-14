@@ -129,11 +129,115 @@ createScene(document.getElementById("bg-canvas"), {
 /* 2. Hero: energy rings + rising particle vortex                       */
 /* ------------------------------------------------------------------ */
 
+/* Builds a stylized female head + shoulders point cloud for the hologram. */
+function buildHeadPointCloud(count = 9000) {
+  const positions = [];
+  const rand = () => Math.random() * 2 - 1;
+
+  // Primitive surfaces: [center, radii, weight]
+  const parts = [
+    { c: [0, 1.62, 0], r: [0.72, 0.92, 0.8], w: 0.42 },   // skull
+    { c: [0, 1.18, 0.12], r: [0.5, 0.48, 0.55], w: 0.18 }, // jaw / chin
+    { c: [0, 0.72, 0], r: [0.26, 0.34, 0.26], w: 0.1 },    // neck
+    { c: [0, 0.1, 0], r: [1.5, 0.52, 0.62], w: 0.3 },      // shoulders / bust
+  ];
+
+  while (positions.length / 3 < count) {
+    // pick a part by weight
+    let pick = Math.random(), part = parts[0];
+    for (const p of parts) { if (pick < p.w) { part = p; break; } pick -= p.w; }
+
+    // random point on unit sphere -> surface of ellipsoid (with slight shell jitter)
+    let x = rand(), y = rand(), z = rand();
+    const len = Math.hypot(x, y, z) || 1;
+    const shell = 0.94 + Math.random() * 0.1;
+    x = (x / len) * part.r[0] * shell + part.c[0];
+    y = (y / len) * part.r[1] * shell + part.c[1];
+    z = (z / len) * part.r[2] * shell + part.c[2];
+
+    // clip shoulders to upper half so the bust fades out like a projection
+    if (part.c[1] < 0.5 && y < -0.32) continue;
+    // flatten the back of the bust
+    if (part.c[1] < 0.5 && z < -0.4) continue;
+    // favour the face: keep more front points on the skull
+    if (part.c[1] > 1 && z < 0 && Math.random() < 0.35) continue;
+
+    positions.push(x, y, z);
+  }
+  return new Float32Array(positions);
+}
+
+const headVertexShader = /* glsl */ `
+  attribute float aRand;
+  uniform float uTime;
+  varying float vGlow;
+  void main() {
+    vec3 p = position;
+    // subtle particle shimmer / breathing
+    p += 0.014 * vec3(
+      sin(uTime * 1.7 + aRand * 40.0),
+      cos(uTime * 1.3 + aRand * 55.0),
+      sin(uTime * 2.1 + aRand * 30.0)
+    );
+    // vertical scan band sweeping the bust
+    float scan = smoothstep(0.12, 0.0, abs(fract(uTime * 0.14) * 3.2 - 0.6 - p.y));
+    vGlow = 0.5 + 0.3 * sin(uTime * 2.0 + aRand * 6.2831) + 0.55 * scan;
+    vec4 mv = modelViewMatrix * vec4(p, 1.0);
+    gl_PointSize = (2.6 + 2.4 * aRand + 1.4 * scan) * (140.0 / -mv.z) * 0.055;
+    gl_Position = projectionMatrix * mv;
+  }
+`;
+
+const headFragmentShader = /* glsl */ `
+  uniform sampler2D uTex;
+  varying float vGlow;
+  void main() {
+    vec4 tex = texture2D(uTex, gl_PointCoord);
+    vec3 cyan = vec3(0.15, 0.75, 1.0);
+    vec3 hot  = vec3(0.75, 0.95, 1.0);
+    vec3 col = mix(cyan, hot, clamp(vGlow - 0.6, 0.0, 1.0));
+    gl_FragColor = vec4(col, tex.a * clamp(vGlow, 0.15, 1.0));
+  }
+`;
+
 createScene(document.getElementById("hero-canvas"), {
   camera: new THREE.PerspectiveCamera(50, 1, 0.1, 100),
   build(scene, entry) {
     entry.camera.position.set(0, 1.2, 9);
     entry.camera.lookAt(2, 0, 0);
+
+    // --- particle hologram head ---
+    const headPos = buildHeadPointCloud();
+    const headGeo = new THREE.BufferGeometry();
+    headGeo.setAttribute("position", new THREE.BufferAttribute(headPos, 3));
+    const rands = new Float32Array(headPos.length / 3);
+    for (let i = 0; i < rands.length; i++) rands[i] = Math.random();
+    headGeo.setAttribute("aRand", new THREE.BufferAttribute(rands, 1));
+
+    entry.headUniforms = { uTime: { value: 0 }, uTex: { value: dotTex } };
+    const headMat = new THREE.ShaderMaterial({
+      uniforms: entry.headUniforms,
+      vertexShader: headVertexShader,
+      fragmentShader: headFragmentShader,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    });
+
+    entry.head = new THREE.Points(headGeo, headMat);
+    entry.head.scale.setScalar(1.5);
+    entry.head.position.set(2.8, -2.1, 0);
+    scene.add(entry.head);
+
+    // faint wireframe ghost inside the head for structure
+    const ghost = new THREE.Mesh(
+      new THREE.SphereGeometry(0.78, 20, 14),
+      new THREE.MeshBasicMaterial({ color: BLUE, wireframe: true, transparent: true, opacity: 0.05 }),
+    );
+    ghost.scale.set(1, 1.22, 1.05);
+    ghost.position.set(2.8, 0.35, 0);
+    scene.add(ghost);
+    entry.ghost = ghost;
 
     entry.rings = new THREE.Group();
     for (let i = 0; i < 5; i++) {
@@ -168,6 +272,9 @@ createScene(document.getElementById("hero-canvas"), {
     scene.add(entry.parts);
   },
   update(t, entry) {
+    entry.headUniforms.uTime.value = t;
+    entry.head.rotation.y = Math.sin(t * 0.35) * 0.45;
+    entry.ghost.rotation.y = -t * 0.2;
     entry.rings.children.forEach((ring, i) => {
       ring.rotation.z = t * (0.1 + i * 0.05) * (i % 2 ? 1 : -1);
       ring.scale.setScalar(1 + Math.sin(t * 1.4 + i) * 0.02);
@@ -459,5 +566,25 @@ document.querySelectorAll(".demo-chip").forEach((chip) => {
   });
 });
 document.querySelector(".demo__form")?.addEventListener("submit", (e) => e.preventDefault());
+
+/* Fallback for any image that fails to load: swap in a holographic
+   silhouette placeholder so the layout never shows a broken icon. */
+const FALLBACK_SVG =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400">
+    <rect width="300" height="400" fill="#060b16"/>
+    <circle cx="150" cy="150" r="58" fill="none" stroke="#00d4ff" stroke-opacity="0.55" stroke-width="2"/>
+    <path d="M60 340 q90 -120 180 0" fill="none" stroke="#00d4ff" stroke-opacity="0.55" stroke-width="2"/>
+    <circle cx="150" cy="150" r="90" fill="none" stroke="#8b5cf6" stroke-opacity="0.25" stroke-width="1"/>
+  </svg>`);
+
+document.querySelectorAll("img").forEach((img) => {
+  img.addEventListener("error", () => {
+    if (img.src !== FALLBACK_SVG) img.src = FALLBACK_SVG;
+  }, { once: true });
+  if (img.complete && img.naturalWidth === 0 && img.src && img.src !== FALLBACK_SVG) {
+    img.src = FALLBACK_SVG;
+  }
+});
 
 animate();

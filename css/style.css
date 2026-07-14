@@ -233,36 +233,7 @@ body {
 
 .hero__visual { position: relative; }
 
-.hero__embed {
-  position: relative;
-  width: 100%;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 0 80px rgba(0, 140, 255, 0.22);
-}
-
-.hero__embed iframe {
-  display: block;
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  max-height: 72vh;
-  border: 0;
-  background: transparent;
-}
-
-.hero__credit {
-  position: absolute;
-  left: 0.9rem;
-  bottom: 0.5rem;
-  font-size: 0.6rem;
-  color: rgba(143, 160, 189, 0.7);
-}
-
-.hero__credit a {
-  color: rgba(0, 212, 255, 0.65);
-  text-decoration: none;
-  font-weight: 600;
-}
+.hero__visual { min-height: 62vh; }
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }

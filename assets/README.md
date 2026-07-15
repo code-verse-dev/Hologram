@@ -1,18 +1,21 @@
 # Assets
 
-The photographic assets for this landing page are AI-generated (Higgsfield Soul v2)
-and served from the generation CDN — see the URLs referenced in `index.html` and
-`css/style.css`. The remote-session network policy blocks downloading them into the
-repo, so they are hotlinked.
+All imagery is stored locally in this directory (supplied via the UAT_SYSTEM
+asset pack), so the site is fully self-contained — no external image CDN.
 
-To make the site fully self-contained, download each URL referenced in
-`index.html`/`css/style.css` into this directory with the matching filename
-(e.g. `hero-hologram.png`) and switch the references back to `assets/<name>`.
-
-| Asset | Purpose |
+| Asset | Used in |
 | --- | --- |
-| hero-hologram | Hero holographic head |
-| persona-doctor / ceo / scientist / teacher / historical / coach | Section 02 persona cards (also reused in section 09) |
-| fob | Section 03 portable AI fob |
-| rooms-a / rooms-b | Section 04 — 2×2 sprite sheets, sliced via CSS `background-position` |
-| robot-hand | Section 10 |
+| hero-main.png | 01 Hero — holographic head artwork |
+| dna-bg.png | 02 — panel background DNA strands |
+| persona-*.png | 02 — persona cards (labels/dots baked into the art) |
+| fob-bg.png, fob-chip-1..6.png | 03 — fob artwork and feature chips |
+| room-*.png | 04 — holographic experience tiles |
+| globe.png | 05 — network globe |
+| timeline-bg.png | 07 — panel background with energy burst |
+| arch-tower.png | 08 — architecture disc tower |
+| demo-faces.png | 09 — persona transformation strip |
+| robot-hand.png | 10 — robotic hand |
+| dna_hologram.glb | 02 — animated 3D DNA model (Three.js GLTFLoader) |
+
+Dark-background artwork is composited with `mix-blend-mode: screen` plus
+feathered `mask-image` gradients so it melts into the panels without cutouts.

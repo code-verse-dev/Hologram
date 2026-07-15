@@ -207,39 +207,8 @@ createScene(document.getElementById("hero-canvas"), {
     entry.camera.position.set(0, 1.2, 9);
     entry.camera.lookAt(2, 0, 0);
 
-    // --- particle hologram head ---
-    const headPos = buildHeadPointCloud();
-    const headGeo = new THREE.BufferGeometry();
-    headGeo.setAttribute("position", new THREE.BufferAttribute(headPos, 3));
-    const rands = new Float32Array(headPos.length / 3);
-    for (let i = 0; i < rands.length; i++) rands[i] = Math.random();
-    headGeo.setAttribute("aRand", new THREE.BufferAttribute(rands, 1));
-
-    entry.headUniforms = { uTime: { value: 0 }, uTex: { value: dotTex } };
-    const headMat = new THREE.ShaderMaterial({
-      uniforms: entry.headUniforms,
-      vertexShader: headVertexShader,
-      fragmentShader: headFragmentShader,
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-    });
-
-    entry.head = new THREE.Points(headGeo, headMat);
-    entry.head.scale.setScalar(1.45);
-    entry.head.position.set(3.7, -1.85, 0);
-    scene.add(entry.head);
-
-    // faint wireframe ghost inside the head for structure
-    const ghost = new THREE.Mesh(
-      new THREE.SphereGeometry(0.78, 20, 14),
-      new THREE.MeshBasicMaterial({ color: BLUE, wireframe: true, transparent: true, opacity: 0.05 }),
-    );
-    ghost.scale.set(1, 1.22, 1.05);
-    ghost.position.set(3.7, 0.5, 0);
-    scene.add(ghost);
-    entry.ghost = ghost;
-
+    // the hero head artwork is a DOM <img>; the canvas adds animated
+    // rings and a rising particle vortex around it
     entry.rings = new THREE.Group();
     for (let i = 0; i < 5; i++) {
       const r = 1.35 + i * 0.62;
@@ -247,7 +216,7 @@ createScene(document.getElementById("hero-canvas"), {
       const mat = new THREE.MeshBasicMaterial({
         color: i % 2 ? BLUE : CYAN,
         transparent: true,
-        opacity: 0.5 - i * 0.07,
+        opacity: 0.3 - i * 0.045,
         blending: THREE.AdditiveBlending,
       });
       const ring = new THREE.Mesh(geo, mat);
@@ -273,9 +242,6 @@ createScene(document.getElementById("hero-canvas"), {
     scene.add(entry.parts);
   },
   update(t, entry) {
-    entry.headUniforms.uTime.value = t;
-    entry.head.rotation.y = Math.sin(t * 0.35) * 0.45;
-    entry.ghost.rotation.y = -t * 0.2;
     entry.rings.children.forEach((ring, i) => {
       ring.rotation.z = t * (0.1 + i * 0.05) * (i % 2 ? 1 : -1);
       ring.scale.setScalar(1 + Math.sin(t * 1.4 + i) * 0.02);
@@ -436,24 +402,7 @@ createScene(document.getElementById("globe-canvas"), {
     entry.camera.position.z = 6.8;
     entry.globe = new THREE.Group();
 
-    const N = 1100, R = 1.75;
-    const pos = new Float32Array(N * 3);
-    for (let i = 0; i < N; i++) {
-      // even-ish sphere distribution
-      const y = 1 - (i / (N - 1)) * 2;
-      const rad = Math.sqrt(1 - y * y);
-      const theta = i * 2.39996; // golden angle
-      pos[i * 3] = Math.cos(theta) * rad * R;
-      pos[i * 3 + 1] = y * R;
-      pos[i * 3 + 2] = Math.sin(theta) * rad * R;
-    }
-    entry.globe.add(makePoints(pos, { size: 0.055, color: new THREE.Color("#59a7ff"), opacity: 0.9 }));
-
-    const wire = new THREE.Mesh(
-      new THREE.SphereGeometry(R * 0.99, 24, 16),
-      new THREE.MeshBasicMaterial({ color: BLUE, wireframe: true, transparent: true, opacity: 0.07 }),
-    );
-    entry.globe.add(wire);
+    const R = 1.75; // the globe itself is a DOM <img>; canvas draws only orbits
 
     // orbiting connection arcs
     for (let i = 0; i < 3; i++) {
@@ -525,68 +474,31 @@ createScene(document.getElementById("timeline-canvas"), {
 createScene(document.getElementById("arch-canvas"), {
   camera: new THREE.PerspectiveCamera(45, 1, 0.1, 100),
   build(scene, entry) {
-    entry.camera.position.set(0, 2.0, 8.6);
-    entry.camera.lookAt(0, 0, 0);
-    entry.tower = new THREE.Group();
-
-    const layers = [
-      { r: 1.9, color: CYAN },
-      { r: 1.55, color: BLUE },
-      { r: 1.25, color: PURPLE },
-      { r: 1.0, color: new THREE.Color("#22c55e") },
-      { r: 1.25, color: BLUE },
-      { r: 1.5, color: CYAN },
-      { r: 1.8, color: PURPLE },
-    ];
-    const H = 3.6;
-    layers.forEach((l, i) => {
-      const y = H / 2 - (i / (layers.length - 1)) * H;
-      const disc = new THREE.Group();
-
+    // the disc tower is a DOM <img>; the canvas drifts particles behind it
+    entry.camera.position.z = 8;
+    const N = 260;
+    const pos = new Float32Array(N * 3);
+    for (let i = 0; i < N; i++) {
+      pos[i * 3] = (Math.random() - 0.5) * 10;
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 9;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 4;
+    }
+    entry.dust = makePoints(pos, { size: 0.07, color: new THREE.Color("#7aa7ff"), opacity: 0.5 });
+    scene.add(entry.dust);
+    entry.halo = new THREE.Group();
+    for (let i = 0; i < 2; i++) {
       const ring = new THREE.Mesh(
-        new THREE.TorusGeometry(l.r, 0.015, 8, 100),
-        new THREE.MeshBasicMaterial({ color: l.color, transparent: true, opacity: 0.75, blending: THREE.AdditiveBlending }),
+        new THREE.TorusGeometry(2.6 + i * 0.9, 0.01, 6, 100),
+        new THREE.MeshBasicMaterial({ color: i ? PURPLE : CYAN, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending }),
       );
-      ring.rotation.x = Math.PI / 2;
-      disc.add(ring);
-
-      const fill = new THREE.Mesh(
-        new THREE.CircleGeometry(l.r * 0.92, 48),
-        new THREE.MeshBasicMaterial({ color: l.color, transparent: true, opacity: 0.06, side: THREE.DoubleSide, blending: THREE.AdditiveBlending }),
-      );
-      fill.rotation.x = -Math.PI / 2;
-      disc.add(fill);
-
-      const M = 60;
-      const ppos = new Float32Array(M * 3);
-      for (let k = 0; k < M; k++) {
-        const a = Math.random() * Math.PI * 2;
-        const rr = l.r * (0.4 + Math.random() * 0.6);
-        ppos[k * 3] = Math.cos(a) * rr;
-        ppos[k * 3 + 1] = (Math.random() - 0.5) * 0.08;
-        ppos[k * 3 + 2] = Math.sin(a) * rr;
-      }
-      disc.add(makePoints(ppos, { size: 0.05, color: l.color, opacity: 0.8 }));
-
-      disc.position.y = y;
-      disc.userData.speed = (0.2 + i * 0.07) * (i % 2 ? -1 : 1);
-      entry.tower.add(disc);
-    });
-
-    // central beam
-    const beam = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.03, 0.03, H + 1, 12),
-      new THREE.MeshBasicMaterial({ color: CYAN, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending }),
-    );
-    entry.tower.add(beam);
-
-    scene.add(entry.tower);
+      ring.rotation.x = Math.PI / 2.6;
+      entry.halo.add(ring);
+    }
+    scene.add(entry.halo);
   },
   update(t, entry) {
-    entry.tower.children.forEach((disc) => {
-      if (disc.userData.speed) disc.rotation.y = t * disc.userData.speed;
-    });
-    entry.tower.rotation.y = t * 0.08;
+    entry.dust.rotation.y = t * 0.05;
+    entry.halo.children.forEach((r, i) => { r.rotation.z = t * (i ? -0.15 : 0.1); });
   },
 });
 

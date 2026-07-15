@@ -15,13 +15,14 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
 
 body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
   overflow-x: hidden;
+  width: 100%;
 }
 
 #bg-canvas {
@@ -174,6 +175,7 @@ body {
   align-items: center;
   padding: 7.5rem 3vw 4rem;
   z-index: 1;
+  overflow: hidden;
 }
 
 #hero-canvas {
@@ -231,18 +233,36 @@ body {
 
 .stat__label { font-size: 0.68rem; letter-spacing: 0.08em; color: var(--text-dim); }
 
-.hero__visual { position: relative; min-height: 62vh; display: grid; align-items: center; }
+.hero__visual {
+  position: relative;
+  min-height: 62vh;
+  display: grid;
+  align-items: center;
+  /* nudge the whole holographic character toward the left */
+  transform: translateX(-9%);
+}
 
 .hero__img {
+  position: relative;
+  z-index: 1;
   width: 100%;
   max-height: 82vh;
-  transform: translateX(9%);
   object-fit: contain;
   /* screen blend + feathered mask melt the artwork's black frame away */
   mix-blend-mode: screen;
-  -webkit-mask-image: radial-gradient(ellipse 62% 58% at 60% 52%, #000 52%, transparent 82%);
-  mask-image: radial-gradient(ellipse 62% 58% at 60% 52%, #000 52%, transparent 82%);
+  -webkit-mask-image: radial-gradient(ellipse 62% 58% at 55% 52%, #000 52%, transparent 82%);
+  mask-image: radial-gradient(ellipse 62% 58% at 55% 52%, #000 52%, transparent 82%);
   animation: float 8s ease-in-out infinite;
+}
+
+/* particle field revolving around the hero character */
+.hero__particles {
+  position: absolute;
+  inset: -6% -6% -6% -6%;
+  width: 112%;
+  height: 112%;
+  z-index: 2;
+  pointer-events: none;
 }
 
 @keyframes float {
@@ -423,30 +443,9 @@ body {
 
 .persona-card img { width: 100%; aspect-ratio: 164 / 271; object-fit: cover; display: block; }
 
+/* the persona artwork already bakes in its own name label and dots */
 .persona-card figcaption,
 .persona-card .dots { display: none; }
-
-.persona-card figcaption--unused {
-  position: absolute;
-  left: 0; right: 0; bottom: 1.15rem;
-  text-align: center;
-  font-family: var(--font-display);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  text-shadow: 0 2px 8px #000;
-}
-
-.persona-card .dots {
-  position: absolute;
-  left: 0; right: 0; bottom: 0.45rem;
-  display: flex;
-  justify-content: center;
-  gap: 4px;
-}
-
-.dots i { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.28); }
 .dots i.on { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
 
 .persona-card::after {
@@ -463,29 +462,24 @@ body {
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: 1fr 1.35fr 1fr;
-  gap: 0.8rem;
+  grid-template-columns: 1fr 1.9fr 1fr;
+  gap: 0.6rem;
   align-items: center;
   margin-top: 1.4rem;
 }
 
-.fob__stage { position: relative; display: grid; place-items: center; }
-
-#fob-canvas {
-  position: absolute;
-  inset: -12%;
-  width: 124%;
-  height: 124%;
-  pointer-events: none;
-}
+.fob__stage { position: relative; display: grid; place-items: center; min-height: 340px; }
 
 .fob__img {
   position: relative;
-  width: 100%;
-  /* screen-blend hides the source image's black background on the dark panel */
+  width: 128%;
+  max-width: none;
+  /* screen-blend hides the source image's near-black background on the
+     dark panel; the mask fades the image's own edges so no rectangular
+     seam shows where its background isn't perfectly pure black */
   mix-blend-mode: screen;
-  -webkit-mask-image: radial-gradient(ellipse 72% 78% at 50% 48%, #000 55%, transparent 78%);
-  mask-image: radial-gradient(ellipse 72% 78% at 50% 48%, #000 55%, transparent 78%);
+  -webkit-mask-image: radial-gradient(ellipse 82% 86% at 50% 48%, #000 68%, transparent 92%);
+  mask-image: radial-gradient(ellipse 82% 86% at 50% 48%, #000 68%, transparent 92%);
   filter: drop-shadow(0 0 44px rgba(0, 160, 255, 0.4));
   animation: float 6s ease-in-out infinite;
 }
@@ -563,17 +557,8 @@ body {
   object-fit: cover;
 }
 
-.holo-tile figcaption {
-  position: absolute;
-  left: 0; right: 0; bottom: 0.5rem;
-  text-align: center;
-  font-family: var(--font-display);
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  text-shadow: 0 2px 6px #000;
-}
+/* the room artwork already bakes its own caption into the image */
+.holo-tile figcaption { display: none; }
 
 .holo-tile::after {
   content: "";
@@ -641,6 +626,46 @@ body {
 }
 
 .tag:hover { border-color: var(--cyan-soft); color: var(--cyan); }
+
+/* connector lines linking each device tag to the earth globe */
+.compat__col .tag { position: relative; overflow: visible; }
+
+.compat__col--left .tag::after,
+.compat__col--right .tag::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  height: 1px;
+  width: clamp(2.4rem, 4.5vw, 5rem);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.compat__col--left .tag::after {
+  left: 100%;
+  background: linear-gradient(90deg, var(--cyan-soft), rgba(0, 212, 255, 0.04));
+}
+
+.compat__col--right .tag::after {
+  right: 100%;
+  background: linear-gradient(270deg, var(--cyan-soft), rgba(0, 212, 255, 0.04));
+}
+
+.compat__col--left .tag::before,
+.compat__col--right .tag::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.compat__col--left .tag::before { left: calc(100% - 3px); }
+.compat__col--right .tag::before { right: calc(100% - 3px); }
 
 .compat__bottom {
   position: relative;
@@ -722,7 +747,7 @@ body {
   z-index: 1;
   display: grid;
   place-items: center;
-  width: 4.2rem; height: 4.2rem;
+  width: 100%; height: 6.4rem;
   border: 1px solid rgba(0, 212, 255, 0.4);
   border-radius: 14px;
   background: #000;
@@ -732,8 +757,8 @@ body {
 }
 
 .sec-step__icon svg {
-  width: 2.6rem;
-  height: 2.6rem;
+  width: 3rem;
+  height: 3rem;
   filter: drop-shadow(0 0 5px rgba(0, 212, 255, 0.8));
 }
 
@@ -915,27 +940,18 @@ body {
   background: rgba(0, 212, 255, 0.06);
 }
 
-.arch__stage { position: relative; height: 420px; }
-
-#arch-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-}
+.arch__stage { position: relative; min-height: 560px; }
 
 .arch__img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  /* tower sits right-of-center in the source art — recenter via crop */
-  object-position: 76% 50%;
+  /* contain shows the full tower with no cropping; the source's black
+     surround disappears via screen blending */
+  object-fit: contain;
+  object-position: center;
   mix-blend-mode: screen;
-  -webkit-mask-image: radial-gradient(ellipse 48% 60% at 50% 50%, #000 50%, transparent 82%);
-  mask-image: radial-gradient(ellipse 48% 60% at 50% 50%, #000 50%, transparent 82%);
   animation: float 9s ease-in-out infinite;
 }
 
@@ -1050,14 +1066,12 @@ body {
 
 .future__hand {
   position: absolute;
-  right: -4%;
-  bottom: -3%;
-  width: 66%;
-  opacity: 0.95;
-  /* screen-blend removes the image's black background against the panel */
-  mix-blend-mode: screen;
-  -webkit-mask-image: radial-gradient(ellipse 78% 82% at 55% 55%, #000 52%, transparent 80%);
-  mask-image: radial-gradient(ellipse 78% 82% at 55% 55%, #000 52%, transparent 80%);
+  right: -2%;
+  bottom: -2%;
+  width: 62%;
+  max-width: 420px;
+  opacity: 1;
+  /* image already has a real transparent background — no blend/mask needed */
   filter: drop-shadow(0 0 40px rgba(0, 140, 255, 0.3));
   pointer-events: none;
   animation: float 8s ease-in-out infinite;
@@ -1121,13 +1135,52 @@ body {
   .nav__links { display: none; }
 }
 
+/* section-specific grids that crush before the general 640px cutoff */
+@media (max-width: 760px) {
+  .compat {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 1.2rem;
+  }
+  .compat__globe {
+    order: -1;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+  .compat__col {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  /* connector lines only read correctly in the side-by-side layout */
+  .compat__col .tag::before,
+  .compat__col .tag::after { display: none; }
+
+  .arch { grid-template-columns: 1fr; }
+  .arch__stage { min-height: 320px; }
+}
+
 @media (max-width: 640px) {
   .personas { grid-template-columns: repeat(2, 1fr); }
   .holo-grid { grid-template-columns: repeat(2, 1fr); }
   .security { grid-template-columns: 1fr; }
   .security__chain { grid-template-columns: repeat(3, 1fr); row-gap: 1.2rem; }
   .fob { grid-template-columns: 1fr; }
-  .fob__chips { flex-direction: row; flex-wrap: wrap; }
-  .timeline { flex-wrap: wrap; }
-  .demo__faces { grid-template-columns: repeat(2, 1fr); }
+  .fob__chips { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+  .fob__stage { min-height: 260px; }
+
+  /* the absolute track/infinity glyph assume a single row; hide them
+     once nodes wrap so pairs of nodes can center cleanly instead */
+  .timeline { flex-wrap: wrap; justify-content: center; gap: 1.8rem 1.2rem; padding: 0 0.5rem 1rem; }
+  .timeline__track,
+  .timeline__inf { display: none; }
+  .tl-node { width: 42%; min-width: 128px; }
+
+  .demo__faces-strip { aspect-ratio: 700 / 640; object-position: 50% 82%; }
+}
+
+@media (max-width: 480px) {
+  .hero__stats { gap: 1.6rem; }
+  .persona-card { min-width: 0; }
 }

@@ -35,7 +35,6 @@
 
   <!-- ================= HERO ================= -->
   <section class="hero" id="home">
-    <canvas id="hero-canvas"></canvas>
     <div class="hero__inner">
       <div class="hero__copy reveal">
         <h1 class="hero__title">
@@ -80,7 +79,6 @@
     <!-- ============ 02 AI TRANSFORMATION ENGINE ============ -->
     <section class="panel panel--engine reveal" id="transform">
       <span class="panel__num">02</span>
-      <canvas class="panel__canvas" id="dna-canvas"></canvas>
       <div class="panel--engine__grid">
         <div class="panel__head">
           <h2 class="panel__title grad-blue">AI Transformation<br />Engine</h2>
@@ -114,7 +112,6 @@
             <img class="chip-img" src="assets/fob-chip-3.png" alt="Voice Recognition" />
           </div>
           <div class="fob__stage">
-            <canvas id="fob-canvas"></canvas>
             <img class="fob__img" src="assets/fob-bg.png" alt="Portable AI fob device" />
           </div>
           <div class="fob__chips fob__chips--right">
@@ -166,7 +163,6 @@
             <div class="tag">&#9673; Vision Pro</div>
           </div>
           <div class="compat__globe">
-            <canvas id="globe-canvas"></canvas>
             <img class="compat__globe-img" src="assets/globe.png" alt="Global network" />
           </div>
           <div class="compat__col compat__col--right">
@@ -194,12 +190,30 @@
         </div>
         <div class="security">
           <div class="security__chain">
-            <div class="sec-step"><span class="sec-step__icon">&#9737;</span><span>Fingerprint</span></div>
-            <div class="sec-step"><span class="sec-step__icon">&#9787;</span><span>Face ID</span></div>
-            <div class="sec-step"><span class="sec-step__icon">&#8767;</span><span>Voice ID</span></div>
-            <div class="sec-step"><span class="sec-step__icon">&#10070;</span><span>Behavior</span></div>
-            <div class="sec-step"><span class="sec-step__icon">&#9634;</span><span>Device</span></div>
-            <div class="sec-step"><span class="sec-step__icon">AI</span><span>AI Verification</span></div>
+            <div class="sec-step">
+              <span class="sec-step__icon"><svg viewBox="0 0 40 40"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M20 10c-6 0-10 4.5-10 10 0 4 1 7 2.5 10"/><path d="M20 14c-3.7 0-6.5 2.8-6.5 6.3 0 3.5 0.8 6.2 2 8.7"/><path d="M20 18c-1.6 0-3 1.3-3 3 0 3 0.7 5.6 1.8 8"/><path d="M23.5 30c-1.2-2.7-2-5.7-2-9"/><path d="M26.8 27.5c-0.8-2.3-1.3-4.5-1.3-7.2 0-3.5-2-6.3-5.5-6.3"/><path d="M30 20c0-5.5-4-10-10-10"/></g></svg></span>
+              <span>Fingerprint</span>
+            </div>
+            <div class="sec-step">
+              <span class="sec-step__icon"><svg viewBox="0 0 40 40"><g fill="none" stroke="currentColor" stroke-width="1.4"><ellipse cx="20" cy="19" rx="9" ry="11"/><path d="M11 19h18M20 8v22M13 12.5c2 1.5 12 1.5 14 0M13 25.5c2-1.5 12-1.5 14 0"/><circle cx="16.5" cy="17" r="0.8" fill="currentColor"/><circle cx="23.5" cy="17" r="0.8" fill="currentColor"/></g></svg></span>
+              <span>Face ID</span>
+            </div>
+            <div class="sec-step">
+              <span class="sec-step__icon"><svg viewBox="0 0 40 40"><g stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="8" y1="17" x2="8" y2="23"/><line x1="12" y1="14" x2="12" y2="26"/><line x1="16" y1="10" x2="16" y2="30"/><line x1="20" y1="15" x2="20" y2="25"/><line x1="24" y1="11" x2="24" y2="29"/><line x1="28" y1="14" x2="28" y2="26"/><line x1="32" y1="17" x2="32" y2="23"/></g></svg></span>
+              <span>Voice ID</span>
+            </div>
+            <div class="sec-step">
+              <span class="sec-step__icon"><svg viewBox="0 0 40 40"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M15 30c-4 0-7-3-7-7 0-2 1-4 2-5 0-4 3-8 8-8 2.5 0 5 1 6.5 3"/><path d="M25 30c4 0 7-3 7-7 0-5-4-7-6-7.5"/><path d="M20 10v20M16 15c1.5 1.5 6.5 1.5 8 0M15 22c2 1.5 8 1.5 10 0"/></g></svg></span>
+              <span>Behavior</span>
+            </div>
+            <div class="sec-step">
+              <span class="sec-step__icon"><svg viewBox="0 0 40 40"><g fill="none" stroke="currentColor" stroke-width="1.5"><rect x="13" y="8" width="14" height="24" rx="2.5"/><line x1="13" y1="12" x2="27" y2="12"/><line x1="13" y1="27" x2="27" y2="27"/><circle cx="20" cy="29.5" r="0.9" fill="currentColor"/></g></svg></span>
+              <span>Device</span>
+            </div>
+            <div class="sec-step">
+              <span class="sec-step__icon"><svg viewBox="0 0 40 40"><g fill="none" stroke="currentColor" stroke-width="1.4"><rect x="12" y="12" width="16" height="16" rx="2"/><text x="20" y="24" text-anchor="middle" font-size="9" font-family="Inter,sans-serif" font-weight="700" fill="currentColor" stroke="none">AI</text><g stroke-linecap="round"><line x1="16" y1="12" x2="16" y2="8"/><line x1="20" y1="12" x2="20" y2="8"/><line x1="24" y1="12" x2="24" y2="8"/><line x1="16" y1="28" x2="16" y2="32"/><line x1="20" y1="28" x2="20" y2="32"/><line x1="24" y1="28" x2="24" y2="32"/><line x1="12" y1="16" x2="8" y2="16"/><line x1="12" y1="20" x2="8" y2="20"/><line x1="12" y1="24" x2="8" y2="24"/><line x1="28" y1="16" x2="32" y2="16"/><line x1="28" y1="20" x2="32" y2="20"/><line x1="28" y1="24" x2="32" y2="24"/></g></g></svg></span>
+              <span>AI Verification</span>
+            </div>
           </div>
           <div class="security__badge">
             <p>Identity<br />Verified</p>
@@ -212,7 +226,6 @@
     <!-- ============ 07 PATENT INNOVATION TIMELINE ============ -->
     <section class="panel panel--patent reveal" id="patent">
       <span class="panel__num">07</span>
-      <canvas class="panel__canvas" id="timeline-canvas"></canvas>
       <div class="panel__head">
         <h2 class="panel__title grad-blue">Patent Innovation Timeline</h2>
         <p class="panel__text">A decade of innovation. A lifetime of impact.</p>
@@ -248,7 +261,6 @@
             <li><span class="arch__icon">&#9825;</span><span class="arch__item">Human Experience<small>Designed for intuitive and meaningful interactions.</small></span></li>
           </ul>
           <div class="arch__stage">
-            <canvas id="arch-canvas"></canvas>
             <img class="arch__img" src="assets/arch-tower.png" alt="System architecture hologram tower" />
           </div>
         </div>

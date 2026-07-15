@@ -238,31 +238,17 @@ body {
   min-height: 62vh;
   display: grid;
   align-items: center;
-  /* nudge the whole holographic character toward the left */
-  transform: translateX(-9%);
 }
 
-.hero__img {
+.hero__video {
   position: relative;
   z-index: 1;
   width: 100%;
   max-height: 82vh;
   object-fit: contain;
-  /* screen blend + feathered mask melt the artwork's black frame away */
-  mix-blend-mode: screen;
-  -webkit-mask-image: radial-gradient(ellipse 62% 58% at 55% 52%, #000 52%, transparent 82%);
-  mask-image: radial-gradient(ellipse 62% 58% at 55% 52%, #000 52%, transparent 82%);
-  animation: float 8s ease-in-out infinite;
-}
-
-/* particle field revolving around the hero character */
-.hero__particles {
-  position: absolute;
-  inset: -6% -6% -6% -6%;
-  width: 112%;
-  height: 112%;
-  z-index: 2;
-  pointer-events: none;
+  /* feather the video's rectangular edges into the panel */
+  -webkit-mask-image: radial-gradient(ellipse 68% 64% at 50% 50%, #000 58%, transparent 88%);
+  mask-image: radial-gradient(ellipse 68% 64% at 50% 50%, #000 58%, transparent 88%);
 }
 
 @keyframes float {
